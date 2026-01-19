@@ -1,65 +1,124 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import BMICalculator from '@/components/BMICalculator';
+import BMIReport from '@/components/BMIReport';
+import { BMIRecord } from '@/types';
+import { generateMockData } from '@/utils/bmi';
+import { Activity, Heart, LogIn, LogOut } from 'lucide-react';
+import { logout, checkAuth } from '@/actions/auth';
+import Link from 'next/link';
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+  const [records, setRecords] = useState<BMIRecord[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    checkAuth().then(setIsLoggedIn);
+  }, []);
+
+  // Load from local storage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('bmi_records');
+    if (saved) {
+      try {
+        setRecords(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to parse records', e);
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Save to local storage whenever records change
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('bmi_records', JSON.stringify(records));
+    }
+  }, [records, isLoaded]);
+
+  const handleAddRecord = (record: BMIRecord) => {
+    setRecords((prev) => [record, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+  };
+
+  const handleGenerateMock = () => {
+    const mockData = generateMockData(50);
+    setRecords((prev) => [...mockData, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+  };
+
+  const handleClearData = () => {
+    if (confirm('Are you sure you want to clear all data?')) {
+      setRecords([]);
+    }
+  };
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin text-indigo-600">
+            <Activity size={48} />
+          </div>
+          <p className="text-slate-500 font-medium">Loading your health data...</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans">
+      {/* Header */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-10 backdrop-blur-md bg-white/80">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="bg-indigo-600 p-1.5 rounded-lg text-white">
+              <Heart size={20} fill="currentColor" />
+            </div>
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">BMI<span className="text-indigo-600">Tracker</span></h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-slate-500 font-medium hidden sm:block">
+              Stay Healthy
+            </div>
+            <button 
+              onClick={() => logout()} 
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-red-600 transition-colors bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-lg"
+            >
+              <LogOut size={16} />
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="py-10 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto space-y-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
+              Track Your Health Journey
+            </h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+              Monitor your Body Mass Index (BMI) over time to stay on top of your fitness goals.
+            </p>
+          </div>
+          
+          <BMICalculator 
+            onAddRecord={handleAddRecord} 
+            onGenerateMock={handleGenerateMock}
+            onClearData={handleClearData}
+          />
+          
+          <BMIReport records={records} />
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-slate-200 mt-12 py-8">
+        <div className="max-w-5xl mx-auto px-4 text-center text-slate-400 text-sm">
+          <p>&copy; {new Date().getFullYear()} BMI Tracker. Built with Next.js & Tailwind CSS.</p>
+        </div>
+      </footer>
     </div>
   );
 }
