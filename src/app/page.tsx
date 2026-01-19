@@ -5,12 +5,18 @@ import BMICalculator from '@/components/BMICalculator';
 import BMIReport from '@/components/BMIReport';
 import { BMIRecord } from '@/types';
 import { generateMockData } from '@/utils/bmi';
-import { Activity, Heart, LogOut } from 'lucide-react';
-import { logout } from '@/actions/auth';
+import { Activity, Heart, LogIn, LogOut } from 'lucide-react';
+import { logout, checkAuth } from '@/actions/auth';
+import Link from 'next/link';
 
 export default function Home() {
   const [records, setRecords] = useState<BMIRecord[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    checkAuth().then(setIsLoggedIn);
+  }, []);
 
   // Load from local storage on mount
   useEffect(() => {
@@ -76,13 +82,23 @@ export default function Home() {
             <div className="text-sm text-slate-500 font-medium hidden sm:block">
               Stay Healthy
             </div>
-            <button 
-              onClick={() => logout()} 
-              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-red-600 transition-colors bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-lg"
-            >
-              <LogOut size={16} />
-              <span>Logout</span>
-            </button>
+            {isLoggedIn ? (
+              <button 
+                onClick={() => logout()} 
+                className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-red-600 transition-colors bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-lg"
+              >
+                <LogOut size={16} />
+                <span>Logout</span>
+              </button>
+            ) : (
+              <Link 
+                href="/login" 
+                className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg"
+              >
+                <LogIn size={16} />
+                <span>Login</span>
+              </Link>
+            )}
           </div>
         </div>
       </header>
