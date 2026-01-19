@@ -1,19 +1,11 @@
 'use server'
 
-import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { createSession, deleteSession, getSession } from '@/lib/session'
 import bcrypt from 'bcryptjs'
 import { redirect } from 'next/navigation'
 
-// Simple validation schema manually or use Zod if available?
-// I will just use manual validation for now to avoid installing more deps if not requested,
-// but usually Zod is standard. Let's see if I can just use basic checks.
-// Actually, I'll install zod because it makes validation much safer and easier.
-// But first, let's try without it to follow "nothing more, nothing less" strictly, 
-// OR I can just do manual checks. Manual checks are fine for this scope.
-
-export async function signup(prevState: any, formData: FormData) {
+export async function signup(prevState: unknown, formData: FormData) {
   const username = formData.get('username') as string
   const password = formData.get('password') as string
 
@@ -55,7 +47,7 @@ export async function signup(prevState: any, formData: FormData) {
   redirect('/')
 }
 
-export async function login(prevState: any, formData: FormData) {
+export async function login(prevState: unknown, formData: FormData) {
   const username = formData.get('username') as string
   const password = formData.get('password') as string
 

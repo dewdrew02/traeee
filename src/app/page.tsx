@@ -5,27 +5,22 @@ import BMICalculator from '@/components/BMICalculator';
 import BMIReport from '@/components/BMIReport';
 import { BMIRecord } from '@/types';
 import { generateMockData } from '@/utils/bmi';
-import { Activity, Heart, LogIn, LogOut } from 'lucide-react';
-import { logout, checkAuth } from '@/actions/auth';
-import Link from 'next/link';
+import { Activity, Heart, LogOut } from 'lucide-react';
+import { logout } from '@/actions/auth';
 
 export default function Home() {
   const [records, setRecords] = useState<BMIRecord[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    checkAuth().then(setIsLoggedIn);
-  }, []);
 
   // Load from local storage on mount
   useEffect(() => {
     const saved = localStorage.getItem('bmi_records');
     if (saved) {
       try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setRecords(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to parse records', e);
+      } catch {
+        // Ignore parsing errors
       }
     }
     setIsLoaded(true);
