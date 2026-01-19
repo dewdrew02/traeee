@@ -1,8 +1,7 @@
-import 'server-only'
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 
-const secretKey = process.env.JWT_SECRET
+const secretKey = process.env.SESSION_SECRET || 'default_secret_key'
 const encodedKey = new TextEncoder().encode(secretKey)
 
 export type SessionPayload = {
@@ -33,8 +32,8 @@ export async function decrypt(session: string | undefined = '') {
 export async function createSession(userId: number, username: string) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
   const session = await encrypt({ userId, username, expiresAt })
-  
   const cookieStore = await cookies()
+  
   cookieStore.set('session', session, {
     httpOnly: true,
     secure: true,
@@ -51,12 +50,7 @@ export async function deleteSession() {
 
 export async function getSession() {
   const cookieStore = await cookies()
-  const session = cookieStore.get('session')?.value
-  const payload = await decrypt(session)
-  
-  if (!payload) {
-    return null
-  }
-  
-  return payload
+  const cookie = cookieStore.get('session')?.value
+  const session = await decrypt(cookie)
+  return session
 }
