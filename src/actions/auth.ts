@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import * as prisma from '@/lib/prisma'
 import { createSession, deleteSession, getSession } from '@/lib/session'
 import bcrypt from 'bcryptjs'
 import { redirect } from 'next/navigation'
@@ -22,7 +22,7 @@ export async function signup(prevState: unknown, formData: FormData) {
   }
 
   // Check if user exists
-  const existingUser = await prisma.user.findUnique({
+  const existingUser = await prisma.prisma.user.findUnique({
     where: { username },
   })
 
@@ -34,7 +34,7 @@ export async function signup(prevState: unknown, formData: FormData) {
   const hashedPassword = await bcrypt.hash(password, 10)
 
   // Create user
-  const user = await prisma.user.create({
+  const user = await prisma.prisma.user.create({
     data: {
       username,
       password_hash: hashedPassword,
@@ -56,7 +56,7 @@ export async function login(prevState: unknown, formData: FormData) {
   }
 
   // Find user
-  const user = await prisma.user.findUnique({
+  const user = await prisma.prisma.user.findUnique({
     where: { username },
   })
 
