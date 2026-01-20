@@ -1,11 +1,11 @@
 'use server'
 
-import * as prisma from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 import { createSession, deleteSession, getSession } from '@/lib/session'
 import bcrypt from 'bcryptjs'
 import { redirect } from 'next/navigation'
 
-export async function signup(prevState: unknown, formData: FormData) {
+export async function signup(_prevState: unknown, formData: FormData) {
   const username = formData.get('username') as string
   const password = formData.get('password') as string
 
@@ -22,7 +22,7 @@ export async function signup(prevState: unknown, formData: FormData) {
   }
 
   // Check if user exists
-  const existingUser = await prisma.prisma.user.findUnique({
+  const existingUser = await prisma.user.findUnique({
     where: { username },
   })
 
