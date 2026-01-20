@@ -22,7 +22,7 @@ export default function LoginPage() {
         <div className="p-8">
           <div className="mb-6 p-4 bg-blue-50 text-blue-800 rounded-xl text-sm border border-blue-100">
             <p className="font-semibold mb-1">Demo Credentials:</p>
-            <p>Username: <span className="font-mono font-bold">admin</span></p>
+            <p>Username: <span className="font-mono font-bold">admin111@gmail.com</span></p>
             <p>Password: <span className="font-mono font-bold">password123</span></p>
           </div>
 

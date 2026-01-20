@@ -11,7 +11,7 @@ const prismaClientSingleton = () => {
 const prisma = prismaClientSingleton()
 
 async function main() {
-  const username = 'admin'
+  const username = 'admin111@gmail.com'
   const password = 'password123'
   const passwordHash = await bcrypt.hash(password, 10)
 
