@@ -34,7 +34,7 @@ export async function signup(_prevState: unknown, formData: FormData) {
   const hashedPassword = await bcrypt.hash(password, 10)
 
   // Create user
-  const user = await prisma.prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       username,
       password_hash: hashedPassword,
@@ -56,7 +56,7 @@ export async function login(prevState: unknown, formData: FormData) {
   }
 
   // Find user
-  const user = await prisma.prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { username },
   })
 

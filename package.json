@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:e2e": "playwright test",
+    "test:ui": "playwright test --ui",
     "postinstall": "prisma generate && prisma db push"
   },
   "dependencies": {

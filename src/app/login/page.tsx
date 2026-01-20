@@ -20,6 +20,12 @@ export default function LoginPage() {
         </div>
 
         <div className="p-8">
+          <div className="mb-6 p-4 bg-blue-50 text-blue-800 rounded-xl text-sm border border-blue-100">
+            <p className="font-semibold mb-1">Demo Credentials:</p>
+            <p>Username: <span className="font-mono font-bold">admin</span></p>
+            <p>Password: <span className="font-mono font-bold">password123</span></p>
+          </div>
+
           <form action={formAction} className="space-y-6">
             {state?.error && (
               <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm border border-red-100">
